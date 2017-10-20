@@ -19,10 +19,7 @@ delimiter = ',';
 formatSpec_act = '%s %u %u';
 %   Format: annotation.txt
 %   #video <vid_id>
-%   <start_time>, <end_time>, <activity_label>
-%   ...
-%   #video <vid_id>
-%   <start_time>, <end_time>, <activity_label>
+%   <activity_label>, <start_time>, <end_time>
 %   ...
 formatSpec_ans = '%u %c %u';
 %   Format: qualTestAnswers.txt
@@ -36,6 +33,16 @@ end
 
 [data_vid_act, data_act] = readmyfile(filename_act,formatSpec_act, delimiter);
 [data_vid_ans, data_ans] = readmyfile(filename_ans,formatSpec_ans, delimiter);
+
+Data_act = [num2cell(data_act{:,1}) num2cell(data_act{:,2}) num2cell(data_act{:,3})];
+Data_ans = [num2cell(data_ans{:,1}) num2cell(data_ans{:,2}) num2cell(data_ans{:,3})];
+
+% Get percentage of annotations
+ann_num = size(Data_act,1);
+min_time = min(cell2mat(Data_act(:,2))); %in frames
+max_time = max(cell2mat(Data_act(:,3))); %in frames
+
+ann_perc = 100 * 7 / double((max_time-min_time));
 
 
 %data_act{2}(3) %parse a column vector: data_act{X}(Y), where 1<X<3 , 1<Y<N
