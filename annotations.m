@@ -17,14 +17,7 @@ filename_dir = '../../Desktop/annotation_files/';
 delimiter = ',';
 
 formatSpec_act = '%s %u %u';
-%   Format: annotation.txt
-%   #video <vid_id>
-%   <activity_label>, <start_time>, <end_time>
-%   ...
 formatSpec_ans = '%u %c %u';
-%   Format: qualTestAnswers.txt
-%   #video <vid_id>
-%   <ans1>, <ans2>, <duration_of_assignment>
 
 files = dir(filename_dir);
 for k=1:length(files)
@@ -37,10 +30,32 @@ end
 Data_act = [num2cell(data_act{:,1}) num2cell(data_act{:,2}) num2cell(data_act{:,3})];
 Data_ans = [num2cell(data_ans{:,1}) num2cell(data_ans{:,2}) num2cell(data_ans{:,3})];
 
+clear data_act; clear data_ans;
+
+%dt_str = cell2mat(Data_act(:,1));
+Data_mat = [cell2mat(Data_act(:,2)) cell2mat(Data_act(:,3))];
+
+% sort the activities in ascending order reference to the starting time
+Ascend_order = sortrows(Data_mat);
+% sort the activity labels
+as = size(Data_act,1);
+for i=1:as
+    for j=1:as
+        if (isequal(Ascend_order(i,1), Data_act{j,2}) && isequal(Ascend_order(i,2), Data_act{j,3}))
+            Act_label(i)=Data_act{j,1};
+        end
+    end
+end
+
+Act_label = Act_label.';
+
+Ascend_cells = sortrows(Data_act, 2);
+
+
 % Get percentage of annotations
 ann_num = size(Data_act,1);
-min_time = min(cell2mat(Data_act(:,2))); %in frames
-max_time = max(cell2mat(Data_act(:,3))); %in frames
+min_time = min(cell2mat(Data_act(:,2))); % time in frames
+max_time = max(cell2mat(Data_act(:,3))); % time in frames
 
 ann_perc = 100 * 7 / double((max_time-min_time));
 
@@ -49,17 +64,3 @@ ann_perc = 100 * 7 / double((max_time-min_time));
                 %and N = total annotations
 
 %data_ans{3} %parse elements: data_ans{1,X},where 1<X<4
-
-%%      FUNCTIONS       %%
-
-% Read file function :
-% Input: the file's path, the data format, the delimiter
-% Output: the video's ID, the data scructured in column vectors
-function [data_vid, data] = readmyfile (filename, formatSpec, delimiter)
-    fprintf('Loading file...');
-    fileID = fopen(filename);
-    data_vid = textscan(fileID, '#video %u', 1, 'Delimiter', '\n');
-    data = textscan(fileID, formatSpec, 'Delimiter', delimiter, 'ReturnOnError', false);
-    fclose(fileID);
-    fprintf('Done\n');
-end
