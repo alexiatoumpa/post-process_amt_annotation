@@ -9,10 +9,16 @@
 % Initialize your workspace
 clear;clc;
 
-filename_act = '../../Desktop/annotation_files/annotation_232323.txt';
-filename_ans = '../../Desktop/annotation_files/qualTestAnswers_232323.txt';
+%filename_act = '../../Desktop/annotation_files/annotation_232323.txt';
+%filename_ans = '../../Desktop/annotation_files/qualTestAnswers_232323.txt';
 
-filename_dir = '../../Desktop/annotation_files/';
+%filename_dir = '../../Desktop/annotation_files/';
+
+filename_act = '../../Data/Annotations/annotation_232323.txt';
+filename_ans = '../../Data/Annotations/qualTestAnswers_232323.txt';
+
+filename_dir = '../../Data/Annotations/';
+
 
 delimiter = ',';
 
@@ -36,7 +42,8 @@ clear data_act; clear data_ans;
 Data_mat = [cell2mat(Data_act(:,2)) cell2mat(Data_act(:,3))];
 
 % sort the activities in ascending order reference to the starting time
-Ascend_order = sortrows(Data_mat);
+[Ascend_order indx] = sortrows(Data_mat);
+%Data_act(:,1)(indx)
 % sort the activity labels
 as = size(Data_act,1);
 for i=1:as
@@ -51,6 +58,18 @@ Act_label = Act_label.';
 
 Ascend_cells = sortrows(Data_act, 2);
 
+% create Timeline
+timeline_unsorted = [Ascend_order(:,1); Ascend_order(:,2)];
+timeline = sortrows(timeline_unsorted);
+clear timeline_unsorted;
+
+% Plot Timeline
+len = length(Ascend_order(:,1));
+for i=1:len
+    plot([Ascend_order(i,1), Ascend_order(i,2)],[i i], 'LineWidth', 10);
+    hold on;
+end
+
 
 % Get percentage of annotations
 ann_num = size(Data_act,1);
@@ -64,3 +83,37 @@ ann_perc = 100 * 7 / double((max_time-min_time));
                 %and N = total annotations
 
 %data_ans{3} %parse elements: data_ans{1,X},where 1<X<4
+
+% Create Time Intervals and Count activities at these intervals
+ioverl=1;
+len = length(timeline);
+len_asc = length(Ascend_order(:,1));
+pointer_start = timeline(1);
+pointer_end = timeline(len);
+pointer_stop = 0;
+reached_end = false;
+while ~reached_end
+    if (~isequal(pointer_stop, pointer_end)) % go in the loop
+        min_stop_value = pointer_end + 1;
+        for i=len:-1:1
+            if((timeline(i)>pointer_start) & (timeline(i)<min_stop_value))
+                    min_stop_value = timeline(i);
+                    pointer_stop = min_stop_value;
+            end
+        end
+        pointer_stop;
+        % check for activity overlaps
+        sum_ovrl=0;
+        for i=1:len_asc
+            if(Ascend_order(i,1)<=pointer_start & Ascend_order(i,2)>pointer_start)
+                sum_ovrl = sum_ovrl + 1;
+            end
+        end
+        Overlaps(ioverl) = sum_ovrl;
+        ioverl = ioverl + 1;
+        pointer_start = pointer_stop;
+    else
+        reached_end = true; % terminate
+    end
+end
+
