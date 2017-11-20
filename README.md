@@ -23,3 +23,5 @@ qualTestAnswers.txt
 > #video <vid_id>
 
 > <ans1>, <ans2>, <duration_of_assignment>, <start_hit>
+
+> ...
