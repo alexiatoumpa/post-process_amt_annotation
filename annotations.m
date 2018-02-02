@@ -11,9 +11,9 @@ clear;clc;
 close all;
 
 % Mac OS Filesystem
-filename_act = '../../Desktop/annotation_files/annotation_232323.txt';
-filename_ans = '../../Desktop/annotation_files/qualTestAnswers_232323.txt';
-filename_dir = '../../Desktop/annotation_files/';
+filename_act = '../test_data/annotation_232323.txt';
+filename_ans = '../test_data/qualTestAnswers_232323.txt';
+filename_dir = '../test_data/';
 
 % Windows OS Filesystem
 %filename_act = '../../Data/Annotations/annotation_232323.txt';
@@ -72,8 +72,8 @@ for i=1:len
     plot([Ascend_order(i,1), Ascend_order(i,2)],[i i], 'LineWidth', 10);
     hold on;
 end
-xlabel('Frames (time)')
-ylabel('Activities (ordered)')
+xlabel('Time(frames)')
+ylabel('Activities')
 legend(char(Ascend_cells{1}),char(Ascend_cells{2}),char(Ascend_cells{3}), char(Ascend_cells{4}), char(Ascend_cells{5}), char(Ascend_cells{6}),char(Ascend_cells{7}),char(Ascend_cells{8}), 'Location', 'southeast')
 
 %{
